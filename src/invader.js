@@ -33,7 +33,6 @@ export default class Invader {
     }
 
     draw(ctx) {
-        console.log('Drawing invader at', this.x, this.y);
         ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
     }
 }
