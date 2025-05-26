@@ -1,6 +1,16 @@
 import Invader from "./invader";
+import MovingDirection from "./movingDirection"
 
 export default class InvaderController {
+
+    currentDirection = MovingDirection.right;
+    moveDownTimerDefault = 30;
+    moveDownTimer = this.moveDownTimerDefault;
+    xVelocity = 0;
+    yVelocity = 0;
+    defaultXVelocity = 1;
+    defaultYVelocity = 1;
+
     invadersMap = [
         [1, 1, 1, 1, 1, 1, 1, 1, 1],
         [1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -9,7 +19,8 @@ export default class InvaderController {
         [1, 1, 1, 1, 1, 1, 1, 1, 1],
         [2, 2, 2, 2, 2, 2, 2, 2, 2]
     ];
-    invaderRows = [
+
+    invadersRows = [
         [], [], [], [], [], []
     ];
 
@@ -17,27 +28,91 @@ export default class InvaderController {
         this.canvas = canvas;
     }
 
-    createInvaders() {
-    this.invadersMap.forEach((row, rowIndex) => {
-        this.invaderRows[rowIndex] = [];
+    
 
-        row.forEach((invaderNumber, invaderIndex) => {
-        if (invaderNumber > 0) {
-            this.invaderRows[rowIndex].push(
-            new Invader(invaderIndex * 50, rowIndex * 35, invaderNumber)
-            );
-        }
+    draw(ctx) {
+        this.decrementMoveDownTimer();
+        this.drawInvaders(ctx);
+        this.updateVelocityAndDirection();
+        this.resetMoveDownTimer();
+    }
+
+    createInvaders() {
+        this.invadersMap.forEach((row, rowIndex) => {
+            this.invadersRows[rowIndex] = [];
+
+            row.forEach((invaderNumber, invaderIndex) => {
+                if (invaderNumber > 0) {
+                    this.invadersRows[rowIndex].push(
+                        new Invader(invaderIndex * 50, rowIndex * 35, invaderNumber)
+                    );
+                }
+            });
         });
-    });
     }
 
     drawInvaders(ctx) {
-        this.invaderRows.flat().forEach((invader)=>{
+        this.invadersRows.flat().forEach((invader) => {
             invader.draw(ctx);
+            invader.move(this.xVelocity, this.yVelocity);
         })
     }
 
-    draw(ctx) {
-        this.drawInvaders(ctx);
+    updateVelocityAndDirection() {
+        for (const invaderRow of this.invadersRows) {
+            if (this.currentDirection === MovingDirection.right) {
+                this.xVelocity = this.defaultXVelocity;
+                this.yVelocity = 0;
+                const rightMostInvader = invaderRow[invaderRow.length - 1];
+                if (rightMostInvader.x + rightMostInvader.width >= this.canvas.width) {
+                    this.currentDirection = MovingDirection.downLeft;
+                    break;
+                }
+            } else if (this.currentDirection === MovingDirection.downLeft) {
+                if (this.moveDown(MovingDirection.left)) {
+                    break;
+                }
+            } else if (this.currentDirection === MovingDirection.left) {
+                this.xVelocity = -this.defaultXVelocity;
+                this.yVelocity = 0;
+                const leftMostInvader = invaderRow[0];
+                if (leftMostInvader.x <= 0) {
+                    this.currentDirection = MovingDirection.downRight;
+
+                    break;
+                }
+            } else if (this.currentDirection === MovingDirection.downRight) {
+                if (this.moveDown(MovingDirection.right)) {
+                    break;
+                }
+            }
+        }
     }
+    moveDown(newDirection) {
+        this.xVelocity = 0;
+        this.yVelocity = this.defaultYVelocity;
+
+        if (this.moveDownTimer <= 0) {
+            this.currentDirection = newDirection;
+
+            return true;
+        }
+        return false;
+    }
+    
+    resetMoveDownTimer() {
+        if (this.moveDownTimer <= 0) {
+            this.moveDownTimer = this.moveDownTimerDefault;
+        }
+    }
+
+    decrementMoveDownTimer() {
+        if (this.currentDirection === MovingDirection.downLeft ||
+            this.currentDirection === MovingDirection.downRight
+        ) {
+            this.moveDownTimer--;
+        }
+    }
+
+
 }

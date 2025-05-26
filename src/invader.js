@@ -26,7 +26,14 @@ export default class Invader {
                 return Invader1;
         }
     }
+
+    move(xVelocity, yVelocity) {
+        this.x += xVelocity;
+        this.y += yVelocity;
+    }
+
     draw(ctx) {
+        console.log('Drawing invader at', this.x, this.y);
         ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
     }
 }

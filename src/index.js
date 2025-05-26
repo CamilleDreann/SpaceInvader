@@ -12,10 +12,10 @@ background.src = Space;
 
 
 let invaderController = new InvaderController(canvas);
+invaderController.createInvaders();
 
 function game() {
     ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
-    invaderController.createInvaders();
     invaderController.draw(ctx);
 }
 setInterval(game, 1000 / 60);
