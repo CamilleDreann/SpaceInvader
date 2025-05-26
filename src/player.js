@@ -40,9 +40,19 @@ export default class Player {
             this.x -= xVelocity;
         }
     }
+    collideWithWalls(){
+        if (this.x < 0) {
+            this.x = 0;
+        }
+        if (this.x > this.canvas.width - this.width) {
+            this.x = this.canvas.width - this.width;
+            
+        }
+    }
 
     draw(ctx) {
         ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
         this.move(3)
+        this.collideWithWalls()
     }
 }
