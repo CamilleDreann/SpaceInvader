@@ -10,19 +10,39 @@ export default class Player {
 
         this.image = new Image();
         this.image.src = PlayerSprite;
+        document.addEventListener('keydown', this.keydown);
+        document.addEventListener('keyup', this.keyup);
+    }
+    rightPressed = false;
+    leftPressed = false;
+
+    keydown = (event) => {
+        if (event.code == 'ArrowRight') {
+            this.rightPressed = true;
+        }
+        if (event.code == 'ArrowLeft') {
+            this.leftPressed = true;
+        }
+    }
+    keyup = (event) => {
+        if (event.code == 'ArrowRight') {
+            this.rightPressed = false;
+        }
+        if (event.code == 'ArrowLeft') {
+            this.leftPressed = false;
+        }
     }
 
     move(xVelocity) {
-        this.x += xVelocity;
-
-        if (this.x < 0) {
-            this.x = 0;
-        } else if (this.x + this.width > this.canvas.width) {
-            this.x = this.canvas.width - this.width;
+        if (this.rightPressed) {
+            this.x += xVelocity;
+        } else if (this.leftPressed) {
+            this.x -= xVelocity;
         }
     }
 
     draw(ctx) {
         ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+        this.move(3)
     }
 }
